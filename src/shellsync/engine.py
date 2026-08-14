@@ -1,5 +1,5 @@
 from .models import Config, Host, SyncItem
-from .ssh import RemoteHost, SSHError
+from .remote import RemoteConnection, SSHError
 
 
 class SyncEngine:
@@ -13,10 +13,12 @@ class SyncEngine:
         self.dry_run = dry_run
 
     def push_host(self, host: Host) -> bool:
-        print(f"\n{host.name} ({host.address})")
+        print(f"\nConnecting to {host.name} ({host.username}@{host.address})...")
 
         try:
-            with RemoteHost(host) as remote:
+            with RemoteConnection(host) as remote:
+                print(f"✓ Connected as {host.username}")
+
                 for item in self.config.items:
                     self._push_item(remote, item)
 
@@ -28,7 +30,7 @@ class SyncEngine:
 
     def _push_item(
         self,
-        remote: RemoteHost,
+        remote: RemoteConnection,
         item: SyncItem,
     ) -> None:
         source = item.source

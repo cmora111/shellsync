@@ -8,7 +8,7 @@ username = "mora"
 
 [hosts.r400]
 address = "r400"
-username = "mora"
+username = "pi"
 
 [hosts.alienware]
 address = "alienware"
@@ -16,7 +16,7 @@ username = "mora"
 
 [hosts.crowpi]
 address = "crowpi"
-username = "mora"
+username = "pi"
 
 [[items]]
 source = ".bash_aliases"
