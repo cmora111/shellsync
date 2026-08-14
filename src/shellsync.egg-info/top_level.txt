@@ -1,0 +1,4 @@
+commands
+shellsync
+sync_tool
+transport

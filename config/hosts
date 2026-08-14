@@ -1,0 +1,12 @@
+hosts:
+  r400:
+    address: r400
+    username: mora
+
+  alienware:
+    address: alienware
+    username: mora
+
+  crowpi:
+    address: crowpi
+    username: pi

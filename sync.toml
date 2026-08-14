@@ -1,0 +1,40 @@
+[settings]
+source_directory = "files"
+backup = true
+
+[hosts.spectrix]
+address = "spectrix"
+username = "mora"
+
+[hosts.r400]
+address = "r400"
+username = "mora"
+
+[hosts.alienware]
+address = "alienware"
+username = "mora"
+
+[hosts.crowpi]
+address = "crowpi"
+username = "mora"
+
+[[items]]
+source = ".bash_aliases"
+destination = ".bash_aliases"
+
+[[items]]
+source = ".bash_functions"
+destination = ".bash_functions"
+
+[[items]]
+source = ".bash_homeautomation"
+destination = ".bash_homeautomation"
+
+[[items]]
+source = ".bash_local"
+destination = ".bash_local"
+
+[[items]]
+source = ".bash_projects"
+destination = ".bash_projects"
+recursive = true

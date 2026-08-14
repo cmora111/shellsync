@@ -1,0 +1,173 @@
+#######################################################################
+#                                                                     #
+# bash script for maintaining Projects                                #
+#                                                                     #
+#######################################################################
+
+LS="/bin/ls"
+MKDIR="/bin/mkdir"
+RM="/bin/rm"
+
+ProjectConfigPkgTxt="
+
+    Basic setup of the Project package.
+
+"
+ProjectConfigTxt="
+
+    Setup a Project.
+
+"
+ProjectListTxt="
+
+    List all the Projects.
+
+"
+ProjectOpenTxt="
+
+    Open a Project: vim -S Session.vim
+
+"
+ProjectCloseTxt="
+ 
+    Not sure what this will do yet
+"
+ProjectGotoTxt="
+
+    Go to a Project directory.
+
+"
+ProjectSaveTxt="
+
+    Save a Project directories state.
+    Not sure what this will do yet.
+
+"
+ProjectRemoveTxt="
+
+    Remove a Project all together. 
+
+"
+
+ProjectDir=~/Projects
+ProjectDirLast=~/Projects/.Last
+Projects="`${LS} -C ${ProjectDir}`"
+
+ProjectConfigPkg() {
+    ${MKDIR} -p ${ProjectDir}
+    touch ${ProjectDirLast}
+}
+
+ProjectConfig() {
+    Prjct=$1
+    Dir=${ProjectDir}/${Prjct}
+    ProjectLocation=${Dir}/.Location
+    ProjectReadme=${Dir}/README.md
+    ProjectTst=${Dir}/tests
+
+    for project in `ProjectList`
+    do
+        if [ ${project} == ${Prjct} ]
+        then
+            echo
+            echo "Project Already Exists"
+            echo
+            return
+        fi
+    done
+    ${MKDIR} -p ${ProjectDir}/${Prjct}
+    ${MKDIR} -p ${ProjectTst}
+    touch ${ProjectLocation}
+    touch ${ProjectReadme}
+    echo "${Dir}" > ${ProjectLocation}
+    Projects="`${LS} -C ${ProjectDir}`"
+}
+ 
+ProjectRemove() {
+    Prjct=$1
+    Dir=${ProjectDir}/${Prjct}
+
+    while true
+    do
+        read -p "Are you sure you want to delete ${Dir}? " yn
+        case ${yn} in
+            [Yy]* ) ${RM} -rf ${Dir}
+                    break;;
+            [Nn]* ) exit;;
+                * ) echo "Please answer yes or no.";;
+        esac
+    done
+    Projects="`${LS} -C ${ProjectDir}`"
+}
+    
+ProjectList() {
+    echo
+    for project in `echo ${Projects}`
+    do
+        echo "${project}"
+    done
+    echo
+}
+
+ProjectGoto() {
+    if [ $# == 0 ]
+    then
+        cd `cat ${ProjectDirLast}`
+    else
+        Prjct=$1
+        for project in `ProjectList`
+        do
+            if [ ${project} == ${Prjct} ]
+            then
+                cd ${ProjectDir}/${Prjct}
+                return
+            fi
+        done
+        echo
+        echo "Project Does Not Exist"
+        echo
+        echo
+    fi
+}
+
+ProjectSave() {
+    pwd > ${ProjectDirLast}
+}
+
+ProjectOpen() {
+    vim -S Session.vim
+}
+
+ProjectClose() {
+    echo
+}
+
+ProjectHelp() {
+    if [ $# == 1 ]
+    then
+        Cmd=$1
+        case ${Cmd} in
+            ProjectConfigPkg ) echo "${ProjectConfigPkgTxt}";;
+            ProjectConfig )    echo "${ProjectConfigTxt}";;
+            ProjectList )      echo "${ProjectListTxt}";;
+            ProjectOpen )      echo "${ProjectOpenTxt}";;
+            ProjectClose )     echo "${ProjectCloseTxt}";;
+            ProjectGoto )      echo "${ProjectGotoTxt}";;
+            ProjectSave )      echo "${ProjectSaveTxt}";;
+            ProjectRemove )    echo "${ProjectRemoveTxt}";;
+            * ) exit;;
+        esac
+    else
+        echo
+        echo "Command List:  
+    ProjectConfigPkg
+    ProjectConfig ProjectName
+    ProjectList
+    ProjectOpen ProjectName
+    ProjectClose ProjectName
+    ProjectGoto ProjectName
+    ProjectSave ProjectName
+    ProjectRemove ProjectName
+"
+    fi
+}

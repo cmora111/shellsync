@@ -1,0 +1,16 @@
+files:
+  - source: .bash_aliases
+    destination: ~/.bash_aliases
+
+  - source: .bash_functions
+    destination: ~/.bash_functions
+
+  - source: .bash_local
+    destination: ~/.bash_local
+
+  - source: .bash_homeautomation
+    destination: ~/.bash_homeautomation
+
+  - source: .bash_projects
+    destination: ~/.bash_projects
+    recursive: true

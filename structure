@@ -1,0 +1,44 @@
+sync/
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── .gitignore
+├── requirements-dev.txt
+│
+├── src/
+│   └── sync_tool/
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── cli.py
+│       ├── config.py
+│       ├── inventory.py
+│       ├── sync_engine.py
+│       ├── models.py
+│       │
+│       ├── transport/
+│       │   ├── __init__.py
+│       │   └── ssh.py
+│       │
+│       └── commands/
+│           ├── __init__.py
+│           ├── push.py
+│           ├── status.py
+│           ├── diff.py
+│           └── verify.py
+│
+├── config/
+│   ├── hosts.yml
+│   └── files.yml
+│
+├── files/
+│   ├── .bash_aliases
+│   ├── .bash_functions
+│   ├── .bash_homeautomation
+│   ├── .bash_local
+│   └── .bash_projects/
+│
+└── tests/
+    ├── test_config.py
+    ├── test_inventory.py
+    ├── test_sync_engine.py
+    └── test_ssh.py
