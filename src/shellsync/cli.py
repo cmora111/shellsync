@@ -103,18 +103,6 @@ def main() -> int:
                 config.hosts[name]
                 for name in args.hosts
             ]
-        elif args.command == "status":
-            engine = SyncEngine(config)
-
-            ok = True
-
-            for name in args.hosts:
-                host = config.hosts[name]
-
-                if not engine.status_host(host):
-                    ok = False
-
-            return 0 if ok else 1
         else:
             hosts = list(config.hosts.values())
 
@@ -130,6 +118,20 @@ def main() -> int:
                 success = False
 
         return 0 if success else 1
+
+
+    elif args.command == "status":
+        engine = SyncEngine(config)
+
+        ok = True
+
+        for name in args.hosts:
+            host = config.hosts[name]
+
+            if not engine.status_host(host):
+                ok = False
+
+        return 0 if ok else 1
 
     return 2
 
