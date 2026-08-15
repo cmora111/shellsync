@@ -24,12 +24,11 @@ class SyncEngine:
             with RemoteConnection(host) as remote:
                 print(f"✓ Connected as {host.username}")
 
-                # Push common files defined in sync.toml.
-                for item in self.config.items:
-                    self._push_item(remote, item)
-
-                # Push host-specific files automatically.
-                self._push_host_files(remote, host)
+                self._process_host_items(
+                    remote,
+                    host,
+                    self._push_item,
+                )
 
         except (SSHError, SyncError) as exc:
             print(f"✗ ERROR: {exc}")
@@ -47,10 +46,11 @@ class SyncEngine:
             with RemoteConnection(host) as remote:
                 print(f"✓ Connected as {host.username}")
 
-                for item in self.config.items:
-                    self._status_item(remote, item)
-
-                self._status_host_files(remote, host)
+                self._process_host_items(
+                    remote,
+                    host,
+                    self._status_item,
+                )
 
         except (SSHError, SyncError) as exc:
             print(f"✗ ERROR: {exc}")
@@ -78,71 +78,6 @@ class SyncEngine:
         else:
             print(f"  UPDATE      {item.destination}")
 
-    def _push_host_files(
-        self,
-        remote: RemoteConnection,
-        host: Host,
-    ) -> None:
-        host_directory = (
-            self.config.source_directory
-            / "hosts"
-            / host.name
-        )
-
-        if not host_directory.is_dir():
-            return
-
-        for source in sorted(host_directory.iterdir()):
-            if not source.is_file():
-                continue
-
-            # Keep the host suffix on the remote side.
-            #
-            # Example:
-            #
-            # files/hosts/r400/.bash_aliases
-            #     -> ~/.bash_aliases.r400
-            #
-            # files/hosts/r400/.bash_local
-            #     -> ~/.bash_local.r400
-            destination = f"{source.name}.{host.name}"
-
-            item = SyncItem(
-                source=source,
-                destination=destination,
-                recursive=False,
-            )
-
-            self._push_item(remote, item)
-
-    def _status_host_files(
-        self,
-        remote: RemoteConnection,
-        host: Host,
-    ) -> None:
-        host_directory = (
-            self.config.source_directory
-            / "hosts"
-            / host.name
-        )
-
-        if not host_directory.is_dir():
-            return
-
-        for source in sorted(host_directory.iterdir()):
-            if not source.is_file():
-                continue
-
-            destination = f"{source.name}.{host.name}"
-
-            item = SyncItem(
-                source=source,
-                destination=destination,
-                recursive=False,
-            )
-
-            self._status_item(remote, item)
-
     def _push_item(
         self,
         remote: RemoteConnection,
@@ -163,8 +98,6 @@ class SyncEngine:
         if local_hash == remote_hash:
             print(f"  CURRENT     {item.destination}")
             return
-#        else:
-#            print(f"  UPDATE      {item.destination}")
 
         if self.dry_run:
             print(
@@ -191,3 +124,35 @@ class SyncEngine:
             )
 
         print(f"  PUSHED      {item.destination}")
+
+    def _process_host_items(
+        self,
+        remote: RemoteConnection,
+        host: Host,
+        processor,
+    ) -> None:
+        # Common files from sync.toml.
+        for item in self.config.items:
+            processor(remote, item)
+
+        # Host-specific files.
+        host_directory = (
+            self.config.source_directory
+            / "hosts"
+            / host.name
+        )
+
+        if not host_directory.is_dir():
+            return
+
+        for source in sorted(host_directory.iterdir()):
+            if not source.is_file():
+                continue
+
+            item = SyncItem(
+                source=source,
+                destination=f"{source.name}.{host.name}",
+                recursive=False,
+            )
+
+            processor(remote, item)
