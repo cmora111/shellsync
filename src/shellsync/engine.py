@@ -163,8 +163,8 @@ class SyncEngine:
         if local_hash == remote_hash:
             print(f"  CURRENT     {item.destination}")
             return
-        else:
-            print(f"  UPDATE      {item.destination}")
+#        else:
+#            print(f"  UPDATE      {item.destination}")
 
         if self.dry_run:
             print(
