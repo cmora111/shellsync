@@ -58,6 +58,26 @@ class SyncEngine:
 
         return True
 
+    def _status_item(
+        self,
+        remote: RemoteConnection,
+        item: SyncItem,
+    ) -> None:
+        source = item.source
+        destination = remote.remote_path(item.destination)
+
+        if not source.exists():
+            print(f"  MISSING     {item.destination}")
+            return
+
+        local_hash = file_sha256(source)
+        remote_hash = remote.file_hash(destination)
+
+        if local_hash == remote_hash:
+            print(f"  CURRENT     {item.destination}")
+        else:
+            print(f"  UPDATE      {item.destination}")
+
     def _push_host_files(
         self,
         remote: RemoteConnection,
