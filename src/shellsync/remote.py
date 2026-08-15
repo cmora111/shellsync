@@ -14,6 +14,11 @@ class SSHError(RuntimeError):
     pass
 
 
+class SyncError(RuntimeError):
+    """Raised when a synchronization operation fails."""
+    pass
+
+
 class RemoteConnection:
     def __init__(self, host: Host):
         self.host = host

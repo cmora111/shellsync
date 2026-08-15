@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from .models import Config, Host, SyncItem
-from .remote import RemoteConnection, SSHError
+from .remote import RemoteConnection, SSHError, SyncError
 from .checksum import file_sha256
 
 class SyncEngine:
@@ -31,7 +31,7 @@ class SyncEngine:
                 # Push host-specific files automatically.
                 self._push_host_files(remote, host)
 
-        except SSHError as exc:
+        except (SSHError, SyncError) as exc:
             print(f"✗ ERROR: {exc}")
             return False
 
@@ -92,7 +92,7 @@ class SyncEngine:
         remote_hash = remote.file_hash(destination)
 
         if local_hash == remote_hash:
-            print(f"  CURRENT     {source.name}")
+            print(f"  CURRENT     {item.destination}")
             return
 
         if self.dry_run:
@@ -111,4 +111,12 @@ class SyncEngine:
         else:
             remote.upload_file(source, destination)
 
-        print(f"  PUSHED      {source.name}")
+        # Verify the upload.
+        new_hash = remote.file_hash(destination)
+
+        if new_hash != local_hash:
+            raise SyncError(
+                f"Verification failed for {destination}"
+            )
+
+        print(f"  PUSHED      {item.destination}")
