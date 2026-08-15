@@ -37,6 +37,27 @@ class SyncEngine:
 
         return True
 
+    def status_host(self, host: Host) -> bool:
+        print(
+            f"\nConnecting to {host.name} "
+            f"({host.username}@{host.address})..."
+        )
+
+        try:
+            with RemoteConnection(host) as remote:
+                print(f"✓ Connected as {host.username}")
+
+                for item in self.config.items:
+                    self._status_item(remote, item)
+
+                self._status_host_files(remote, host)
+
+        except (SSHError, SyncError) as exc:
+            print(f"✗ ERROR: {exc}")
+            return False
+
+        return True
+
     def _push_host_files(
         self,
         remote: RemoteConnection,
@@ -74,6 +95,34 @@ class SyncEngine:
 
             self._push_item(remote, item)
 
+    def _status_host_files(
+        self,
+        remote: RemoteConnection,
+        host: Host,
+    ) -> None:
+        host_directory = (
+            self.config.source_directory
+            / "hosts"
+            / host.name
+        )
+
+        if not host_directory.is_dir():
+            return
+
+        for source in sorted(host_directory.iterdir()):
+            if not source.is_file():
+                continue
+
+            destination = f"{source.name}.{host.name}"
+
+            item = SyncItem(
+                source=source,
+                destination=destination,
+                recursive=False,
+            )
+
+            self._status_item(remote, item)
+
     def _push_item(
         self,
         remote: RemoteConnection,
@@ -94,6 +143,8 @@ class SyncEngine:
         if local_hash == remote_hash:
             print(f"  CURRENT     {item.destination}")
             return
+        else:
+            print(f"  UPDATE      {item.destination}")
 
         if self.dry_run:
             print(

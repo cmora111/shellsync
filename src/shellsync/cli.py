@@ -51,6 +51,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="list configured hosts",
     )
 
+    status_parser = subparsers.add_parser(
+        "status",
+        help="Show synchronization status",
+    )
+
+    status_parser.add_argument(
+        "hosts",
+        nargs="+",
+    )
+
     return parser
 
 
@@ -93,6 +103,18 @@ def main() -> int:
                 config.hosts[name]
                 for name in args.hosts
             ]
+        elif args.command == "status":
+            engine = SyncEngine(config)
+
+            ok = True
+
+            for name in args.hosts:
+                host = config.hosts[name]
+
+                if not engine.status_host(host):
+                    ok = False
+
+            return 0 if ok else 1
         else:
             hosts = list(config.hosts.values())
 
