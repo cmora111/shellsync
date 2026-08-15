@@ -1,4 +1,5 @@
 from pathlib import Path
+import shlex
 
 from .models import Config, Host, SyncItem
 from .remote import RemoteConnection, SSHError, SyncError
@@ -30,11 +31,32 @@ class SyncEngine:
                     self._push_item,
                 )
 
+                self._push_system_hosts(remote)
+
         except (SSHError, SyncError) as exc:
             print(f"✗ ERROR: {exc}")
             return False
 
         return True
+
+    def _status_system_hosts(
+        self,
+        remote: RemoteConnection,
+    ) -> None:
+        source = self.config.source_directory / "system" / "hosts"
+
+        if not source.is_file():
+            return
+
+        destination = "/etc/hosts"
+
+        local_hash = file_sha256(source)
+        remote_hash = remote.file_hash(destination)
+
+        if local_hash == remote_hash:
+            print("  CURRENT     /etc/hosts")
+        else:
+            print("  UPDATE      /etc/hosts")
 
     def status_host(self, host: Host) -> bool:
         print(
@@ -51,6 +73,8 @@ class SyncEngine:
                     host,
                     self._status_item,
                 )
+                
+                self._status_system_hosts(remote)
 
         except (SSHError, SyncError) as exc:
             print(f"✗ ERROR: {exc}")
@@ -156,3 +180,47 @@ class SyncEngine:
             )
 
             processor(remote, item)
+
+    def _push_system_hosts(
+        self,
+        remote: RemoteConnection,
+    ) -> None:
+        source = self.config.source_directory / "system" / "hosts"
+
+        if not source.is_file():
+            return
+
+        destination = "/etc/hosts"
+        temp = remote.remote_path(".shellsync-hosts.tmp")
+
+        local_hash = file_sha256(source)
+        remote_hash = remote.file_hash(destination)
+
+        if local_hash == remote_hash:
+            print("  CURRENT     /etc/hosts")
+            return
+
+        if self.dry_run:
+            print(f"  WOULD PUSH  {source} -> {destination}")
+            return
+
+        remote.upload_file(source, temp)
+
+        status, _, stderr = remote.execute_sudo(
+            "cp -a /etc/hosts /etc/hosts.sync-backup && "
+            f"install -m 0644 {shlex.quote(temp)} /etc/hosts"
+        )
+
+        if status != 0:
+            raise SyncError(
+                f"Unable to install /etc/hosts: {stderr.strip()}"
+            )
+
+        new_hash = remote.file_hash(destination)
+
+        if new_hash != local_hash:
+            raise SyncError("Verification failed for /etc/hosts")
+
+        remote.execute(f"rm -f -- {shlex.quote(temp)}")
+
+        print("  PUSHED      /etc/hosts")

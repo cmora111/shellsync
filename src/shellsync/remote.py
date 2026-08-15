@@ -100,6 +100,9 @@ class RemoteConnection:
             stderr.read().decode("utf-8", errors="replace"),
         )
 
+    def execute_sudo(self, command: str) -> tuple[int, str, str]:
+        return self.execute(f"sudo -n sh -c {shlex.quote(command)}")
+
     def sha256(self, path: str) -> str | None:
         command = (
             f"sha256sum {shlex.quote(path)} 2>/dev/null"
