@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+
+# -----------------------------------------------------------------------------
+# .bash_projects
+#
+# Project directory helpers.
+# -----------------------------------------------------------------------------
+
+PROJECT_DIR="${HOME}/Projects"
+PROJECT_LAST="${PROJECT_DIR}/.Last"
+
+
+ProjectConfigPkg() {
+    mkdir -p "$PROJECT_DIR"
+    touch "$PROJECT_LAST"
+}
+
+
+ProjectConfig() {
+    local project="$1"
+    local dir
+
+    if [[ -z "$project" ]]; then
+        echo "Usage: ProjectConfig PROJECT"
+        return 1
+    fi
+
+    dir="${PROJECT_DIR}/${project}"
+
+    if [[ -d "$dir" ]]; then
+        echo
+        echo "Project already exists: $project"
+        echo
+        return 1
+    fi
+
+    mkdir -p "$dir/tests"
+    touch "$dir/README.md"
+    printf '%s\n' "$dir" > "$dir/.Location"
+
+    echo
+    echo "Created project: $dir"
+    echo
+}
+
+
+ProjectRemove() {
+    local project="$1"
+    local dir
+    local answer
+
+    if [[ -z "$project" ]]; then
+        echo "Usage: ProjectRemove PROJECT"
+        return 1
+    fi
+
+    dir="${PROJECT_DIR}/${project}"
+
+    if [[ ! -d "$dir" ]]; then
+        echo "Project does not exist: $project"
+        return 1
+    fi
+
+    read -r -p "Are you sure you want to delete ${dir}? [y/N] " answer
+
+    case "$answer" in
+        [Yy]|[Yy][Ee][Ss])
+            rm -rf -- "$dir"
+            echo "Removed project: $project"
+            ;;
+        *)
+            echo "Cancelled."
+            ;;
+    esac
+}
+
+
+ProjectList() {
+    local dir
+
+    if [[ ! -d "$PROJECT_DIR" ]]; then
+        echo "Project directory does not exist: $PROJECT_DIR"
+        return 1
+    fi
+
+    for dir in "$PROJECT_DIR"/*; do
+        [[ -d "$dir" ]] || continue
+        basename "$dir"
+    done
+}
+
+
+ProjectGoto() {
+    local project="$1"
+    local dir
+
+    if [[ -z "$project" ]]; then
+        if [[ ! -s "$PROJECT_LAST" ]]; then
+            echo "No saved project location."
+            return 1
+        fi
+
+        dir="$(<"$PROJECT_LAST")"
+
+        if [[ ! -d "$dir" ]]; then
+            echo "Saved project location no longer exists: $dir"
+            return 1
+        fi
+
+        cd "$dir" || return
+        return
+    fi
+
+    dir="${PROJECT_DIR}/${project}"
+
+    if [[ ! -d "$dir" ]]; then
+        echo "Project does not exist: $project"
+        return 1
+    fi
+
+    cd "$dir" || return
+}
+
+
+ProjectSave() {
+    mkdir -p "$PROJECT_DIR"
+    pwd > "$PROJECT_LAST"
+}
+
+
+ProjectOpen() {
+    local project="$1"
+    local dir
+
+    if [[ -n "$project" ]]; then
+        dir="${PROJECT_DIR}/${project}"
+
+        if [[ ! -d "$dir" ]]; then
+            echo "Project does not exist: $project"
+            return 1
+        fi
+
+        cd "$dir" || return
+    fi
+
+    if [[ -f Session.vim ]]; then
+        vim -S Session.vim
+    else
+        vim
+    fi
+}
+
+
+ProjectClose() {
+    ProjectSave
+}
+
+
+ProjectHelp() {
+    case "${1:-}" in
+        ProjectConfigPkg)
+            echo "Initialize the Projects directory."
+            ;;
+        ProjectConfig)
+            echo "Create a new project."
+            echo "Usage: ProjectConfig PROJECT"
+            ;;
+        ProjectList)
+            echo "List projects."
+            ;;
+        ProjectOpen)
+            echo "Open a project in Vim."
+            echo "Usage: ProjectOpen [PROJECT]"
+            ;;
+        ProjectClose)
+            echo "Save the current project location."
+            ;;
+        ProjectGoto)
+            echo "Change to a project directory."
+            echo "Usage: ProjectGoto [PROJECT]"
+            ;;
+        ProjectSave)
+            echo "Save the current directory as the last project location."
+            ;;
+        ProjectRemove)
+            echo "Remove a project."
+            echo "Usage: ProjectRemove PROJECT"
+            ;;
+        "")
+            cat <<'EOF'
+
+Project commands:
+
+    ProjectConfigPkg
+    ProjectConfig PROJECT
+    ProjectList
+    ProjectOpen [PROJECT]
+    ProjectClose
+    ProjectGoto [PROJECT]
+    ProjectSave
+    ProjectRemove PROJECT
+    ProjectHelp [COMMAND]
+
+EOF
+            ;;
+        *)
+            echo "Unknown command: $1"
+            return 1
+            ;;
+    esac
+}

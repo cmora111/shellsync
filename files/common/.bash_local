@@ -1,0 +1,66 @@
+# -----------------------------------------------------------------------------
+# .bash_local
+#
+# Common shell initialization distributed by shellsync.
+# Machine-specific settings belong in ~/.bash_local.<hostname>.
+# -----------------------------------------------------------------------------
+
+# Get the short hostname once.
+SHELLSYNC_HOST="$(hostname -s)"
+
+# Common aliases.
+if [[ -f "$HOME/.bash_aliases" ]]; then
+    source "$HOME/.bash_aliases"
+fi
+
+# Host-specific aliases.
+if [[ -f "$HOME/.bash_aliases.$SHELLSYNC_HOST" ]]; then
+    source "$HOME/.bash_aliases.$SHELLSYNC_HOST"
+fi
+
+# Common shell functions.
+if [[ -f "$HOME/.bash_functions" ]]; then
+    source "$HOME/.bash_functions"
+fi
+
+# Project helpers.
+if [[ -f "$HOME/.bash_projects" ]]; then
+    source "$HOME/.bash_projects"
+fi
+
+# Home-automation helpers.
+if [[ -f "$HOME/.bash_homeautomation" ]]; then
+    source "$HOME/.bash_homeautomation"
+fi
+
+# Host-specific environment/configuration.
+if [[ -f "$HOME/.bash_local.$SHELLSYNC_HOST" ]]; then
+    source "$HOME/.bash_local.$SHELLSYNC_HOST"
+fi
+
+# User-installed executables.
+if [[ -d "$HOME/.local/bin" ]]; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
+if [[ -d "$HOME/bin" ]]; then
+    PATH="$HOME/bin:$PATH"
+fi
+
+export PATH
+
+# Preferred editor.
+export EDITOR="${EDITOR:-/usr/bin/vim}"
+export SYSTEMD_EDITOR="${SYSTEMD_EDITOR:-vim}"
+
+# Use vi command-line editing.
+set -o vi
+
+# Tilix/VTE integration, where available.
+if [[ -n "${TILIX_ID:-}" || -n "${VTE_VERSION:-}" ]]; then
+    if [[ -r /etc/profile.d/vte.sh ]]; then
+        source /etc/profile.d/vte.sh
+    fi
+fi
+
+unset SHELLSYNC_HOST

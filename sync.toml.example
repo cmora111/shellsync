@@ -1,0 +1,20 @@
+[settings]
+source_directory = "files"
+backup = true
+
+[hosts.example]
+address = "server.example.com"
+username = "user"
+
+[[items]]
+source = ".bash_aliases"
+destination = ".bash_aliases"
+
+[[items]]
+source = ".bash_functions"
+destination = ".bash_functions"
+
+[[items]]
+source = ".bash_projects"
+destination = ".bash_projects"
+recursive = true

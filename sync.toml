@@ -2,6 +2,10 @@
 source_directory = "files"
 backup = true
 
+# ---------------------------------------------------------------------------
+# Hosts
+# ---------------------------------------------------------------------------
+
 [hosts.spectrix]
 address = "spectrix"
 username = "mora"
@@ -10,31 +14,71 @@ username = "mora"
 address = "r400"
 username = "pi"
 
-[hosts.alienware]
-address = "alienware"
-username = "mora"
-
 [hosts.crowpi]
 address = "crowpi"
 username = "pi"
 
+[hosts.alienware]
+address = "alienware"
+username = "mora"
+
+
+# ---------------------------------------------------------------------------
+# Common user files
+# These are installed in every user's home directory.
+# ---------------------------------------------------------------------------
+
 [[items]]
-source = ".bash_aliases"
+source = "common/.bash_aliases"
 destination = ".bash_aliases"
 
 [[items]]
-source = ".bash_functions"
+source = "common/.bash_functions"
 destination = ".bash_functions"
 
 [[items]]
-source = ".bash_homeautomation"
+source = "common/.bash_homeautomation"
 destination = ".bash_homeautomation"
 
 [[items]]
-source = ".bash_local"
+source = "common/.bash_local"
 destination = ".bash_local"
 
 [[items]]
-source = ".bash_projects"
+source = "common/.bash_projects"
 destination = ".bash_projects"
-recursive = true
+
+
+# ---------------------------------------------------------------------------
+# Host-specific files
+#
+# We will have the engine automatically look in:
+#
+#   files/hosts/<hostname>/
+#
+# so these do NOT need to be listed individually here.
+#
+# Example:
+#
+#   files/hosts/r400/.bash_aliases
+#       -> ~/.bash_aliases.r400
+#
+#   files/hosts/r400/.bash_local
+#       -> ~/.bash_local.r400
+#
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# System files
+#
+# Disabled for now.
+# These require privileged installation and will be handled separately.
+#
+# Eventually:
+#
+# [[system_items]]
+# source = "system/hosts"
+# destination = "/etc/hosts"
+#
+# -------------------------------------------------------------------------

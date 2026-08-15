@@ -1,0 +1,28 @@
+127.0.0.1	  localhost
+192.168.1.1	  router
+192.168.1.125	 spectrix                                    # Linux
+
+# Client hosts
+192.168.1.100    weather-station
+192.168.1.109    wallclock
+192.168.1.110    hp_officejet_4650 hp4650 printer
+192.168.1.112    raspberrypi                                 # Linux
+192.168.1.118    ipcam
+192.168.1.119    r400 raspberrypi_400                        # Linux
+192.168.1.120    wyze1
+192.168.1.121    wled-WLED
+192.168.1.124    gemini                                      # Linux
+192.168.1.127    wyze3
+192.168.1.129    virtualwindow                               # Linux
+192.168.1.132    octopi octoprint                            # Linux
+192.168.1.133    netbook
+192.168.1.135    alienware                                   # Linux
+192.168.1.137    Jeep
+192.168.1.138    mail
+192.168.1.141    crowpi                                      # Linux
+192.168.1.151    homeassistant ha                            # Linux
+192.168.1.200    Icicles-DigiQuad
+192.168.1.201    Props_Controller_Falcon16v4
+192.168.1.202    SpotLights_DigiQAuad
+192.168.1.203    Megatree_Falcon16v4
+192.168.1.204    fpp                                         # Linux

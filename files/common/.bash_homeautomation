@@ -1,0 +1,6 @@
+#
+# Home Automation Setup
+#
+export HADIR=~/HomeAutomation
+export PATH=$PATH:$HADIR
+export HAPORT=/dev/ttyUSB0
