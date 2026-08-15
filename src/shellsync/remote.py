@@ -95,6 +95,18 @@ class RemoteConnection:
             stderr.read().decode("utf-8", errors="replace"),
         )
 
+    def sha256(self, path: str) -> str | None:
+        command = (
+            f"sha256sum {shlex.quote(path)} 2>/dev/null"
+        )
+
+        status, stdout, _ = self.execute(command)
+
+        if status != 0:
+            return None
+
+        return stdout.split()[0]
+
     def remote_path(self, destination: str) -> str:
         if self.home is None:
             raise SSHError("Remote home directory is unknown")

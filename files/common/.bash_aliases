@@ -1,6 +1,16 @@
 #
+# Start: CSR
+#
+alias csrandkey='openssl req -new -newkey rsa:2048 -nodes -keyout spectrix.com.key -out spectrix.com.csr'
+alias csrkey='openssl genrsa -out spectrix.com.key 2048'
+alias csr='openssl req -new -key spectrix.com.key -out spectrix.com.csr'
+#
+# End: CSR
+#
+#
 # Start: APT
 #
+alias agi='sudo apt-get install -y '
 alias agr='sudo apt-get -y remove '
 alias ags='apt-cache search'
 # see agi in th .bash_function file
@@ -8,6 +18,7 @@ alias agf='sudo apt -y --fix-broken install'
 alias agudt='sudo apt-get update'
 alias agugd='sudo apt-get upgrade'
 alias agu='sudo apt-get update && sudo apt-get -y upgrade'
+alias agarm='sudo apt autoremove -y'
 #
 # End: APT
 #
@@ -20,11 +31,14 @@ alias ll='ls -alF'
 alias ls='ls --color=auto'
 alias lsg='ls -gailtr'
 alias lsn='ls --color=no -F'
+alias lsp='ls -lt patches'
 alias lsU='lsg /dev/ttyU*'
 alias lst='lsg /dev/tty*'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias grep='grep --color=auto'
+alias galaxy='cd /run/user/1000'
+alias kgvfd='killall gvfs-mtp-volume-monitor'
 #
 # End: General
 #
@@ -41,10 +55,9 @@ alias vi='/usr/bin/vim'
 alias sr='sudo systemctl restart '
 alias ss='sudo systemctl status '
 alias st='sudo systemctl stop '
+alias sctld='sudo systemctl disable'
 alias sl='systemctl list-unit-files | grep enabled'
-#
-# End: Systemctl
-#
+alias srl='sudo systemctl daemon-reload'
 #
 # Start: Logs
 #
@@ -78,9 +91,33 @@ alias print='aeson-pretty'
 alias smkdir='sudo mkdir'
 alias smv='sudo mv'
 alias SCP='sudo cp'
-alias vs='sudo vi'
-alias smnt='sudo mount '
-alias sumnt='sudo umount '
+alias schdir='sudo chdir'
+alias scd='sudo cd'
+#
+# End: sudo commands
+#
+#
+# StartSubL: sudo commands: LVM
+#
+alias spvcreate='sudo pvcreate'
+alias spvscan='sudo pvscan'
+alias spvdisplay='sudo pvdisplay'
+alias spvs='sudo pvs'
+alias spvremove='sudo pvremove'
+alias svgcreate='sudo vgcreate'
+alias svgscan='sudo vgscan'
+alias svgdisplay='sudo vgdisplay'
+alias svgs='sudo vgs'
+alias svgremove='sudo vgremove'
+alias slvcreate='sudo lvcreate'
+alias slvscan='sudo lvscan'
+alias slvdisplay='sudo lvdisplay'
+alias slvs='sudo lvs'
+alias slvremove='sudo lvremove'
+alias dmesg='sudo dmesg -e|grep -v "audit: "|grep -v "kauditd"'
+#
+# EndSub: sudo commands: LVM
+#
 #
 # End: sudo 
 # 
@@ -91,6 +128,7 @@ alias dmesg='sudo dmesg -T'
 alias nc='network_check'
 alias release='lsb_release -a'
 alias wm='wmctrl -m | grep "Name" | cut -c7-'
+alias wt='echo $XDG_SESSION_TYPE'
 alias acd='cd /etc/apache2'
 alias brn="sudo ddrescue -D --force "
 alias ns='sudo netstat -tlnp'
@@ -98,8 +136,12 @@ alias NS='nmcli dev show wlp13s0b1|grep IP4\.DNS'
 alias t25='tail -25'
 alias license='cp ~/.LICENSE ./LICENSE'
 alias si="~/bin/system_information.py"
-alias netscan="sudo nmap -sP 192.168.1.0/24"
-alias psa='ps -axwwl | grep -i '
+alias netscan="nmap -sP 192.168.1.0/24"
+alias netscan2="sudo nmap -sV -sC -O -T5 "
+alias netscan3="sudo nmap -O "
+alias netscan4="nmap -sP 192.168.1.0/24 | awk '/is up/ {print up}; {gsub (/\(|\)/,\"\"); up = \$NF}'"
+alias extip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias xhost+="xhost +si:localuser:root"
 #
 # End: Admin
 #
@@ -210,6 +252,7 @@ alias scpdb='scp ./Coop.db ./Coop.sql pi@coop:/home/pi/Src/Coop'
 # Start: VNC
 #
 alias vnc='x0tigervncserver -localhost=0 -SecurityTypes VncAuth,TLSVnc -geometry 1920x1080 -display=:0'
+alias psa='ps -axwwl | grep -i '
 #
 # End: VNC
 #

@@ -79,6 +79,7 @@ class SyncEngine:
         remote: RemoteConnection,
         item: SyncItem,
     ) -> None:
+
         source = item.source
         destination = remote.remote_path(item.destination)
 
@@ -86,12 +87,15 @@ class SyncEngine:
             print(f"  MISSING     {source}")
             return
 
-        if source.is_dir() and not item.recursive:
-            print(
-                f"  SKIP        {source.name} "
-                "(directory not marked recursive)"
-            )
+        # New code starts here
+        local_hash = file_sha256(source)
+        remote_hash = remote.file_hash(destination)
+
+        if local_hash == remote_hash:
+            print(f"  CURRENT     {source.name}")
             return
+
+        print(f"  UPDATE      {source.name}")
 
         if self.dry_run:
             print(
@@ -101,11 +105,8 @@ class SyncEngine:
 
         if self.config.backup and remote.exists(destination):
             backup = remote.backup(destination)
-
             if backup:
-                print(
-                    f"  BACKUP      {destination} -> {backup}"
-                )
+                print(f"  BACKUP      {destination}")
 
         if source.is_dir():
             remote.upload_directory(source, destination)
