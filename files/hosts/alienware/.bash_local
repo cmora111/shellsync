@@ -1,0 +1,40 @@
+# -----------------------------------------------------------------------------
+# alienware-specific environment
+# -----------------------------------------------------------------------------
+
+export CHEATCOLORS=true
+
+# Xdebug
+export XDEBUG_CONFIG="client_host=192.168.68.118 log=/tmp/xdebug.log"
+
+# CAMotics
+if [[ -d "$HOME/CAMotics/cbang" ]]; then
+    export CBANG_HOME="$HOME/CAMotics/cbang"
+fi
+
+# KiCad libraries
+export KICAD_USER_LIBBRARY="$HOME/.kicad/library/User"
+export KICCAD_DIGIKEY_LIBRARY="$HOME/.kicad/library/Digikey"
+
+# Raspberry Pi Pico SDK
+export PICO_SDK_PATH="$HOME/Projects/RaspberryPi/Pico/pico/pico-sdk"
+export PICO_EXAMPLES_PATH="$HOME/Projects/RaspberryPi/Pico/pico/pico-examples"
+export PICO_EXTRAS_PATH="$HOME/Projects/RaspberryPi/Pico/pico/pico-extras"
+export PICO_PLAYGROUND_PATH="$HOME/Projects/RaspberryPi/Pico/pico/pico-playground"
+
+# Printer
+export PRINTER="OfficeJet_4650_2"
+
+# Git Credential Manager
+export GCM_CREDENTIAL_STORE=gpg
+
+# Platform.sh
+if [[ -d "$HOME/.platformsh/bin" ]]; then
+    PATH="$HOME/.platformsh/bin:$PATH"
+fi
+
+if [[ -r "$HOME/.platformsh/shell-config.rc" ]]; then
+    source "$HOME/.platformsh/shell-config.rc"
+fi
+
+export PATH

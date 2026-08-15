@@ -2,7 +2,7 @@ from pathlib import Path
 
 from .models import Config, Host, SyncItem
 from .remote import RemoteConnection, SSHError
-
+from .checksum import file_sha256
 
 class SyncEngine:
     def __init__(
@@ -94,8 +94,6 @@ class SyncEngine:
         if local_hash == remote_hash:
             print(f"  CURRENT     {source.name}")
             return
-
-        print(f"  UPDATE      {source.name}")
 
         if self.dry_run:
             print(

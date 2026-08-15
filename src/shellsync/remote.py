@@ -126,6 +126,21 @@ class RemoteConnection:
         except (FileNotFoundError, OSError):
             return False
 
+    def file_hash(self, path: str) -> str | None:
+        command = f"sha256sum {shlex.quote(path)} 2>/dev/null"
+
+        status, stdout, _ = self.execute(command)
+
+        if status != 0:
+            return None
+
+        parts = stdout.split()
+
+        if not parts:
+            return None
+
+        return parts[0]
+
     def mkdir_p(self, path: str) -> None:
         if self.sftp is None:
             raise SSHError("SFTP connection is not open")
