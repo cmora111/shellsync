@@ -1,12 +1,21 @@
 # shellsync
 
-Synchronize shell configuration files across Linux hosts over SSH.
+I wanted a simple way to keep my shell environment synchronized 
+across multiple Linux machines without the complexity of a full 
+configuration management system. shellsync focuses on a single 
+job—keeping personal configuration files in sync safely and 
+predictably.
 
-`shellsync` keeps your dotfiles synchronized using SHA-256 checksums,
-only transferring files that have changed. It supports common files,
-host-specific files, and selected system files such as `/etc/hosts`.
+## Why shellsync?
 
----
+Unlike simple copy scripts, `shellsync`:
+
+- compares files using SHA-256 checksums
+- transfers only changed files
+- creates backups before overwriting files
+- verifies uploads after transfer
+- supports host-specific configuration
+- safely manages selected system files
 
 ## Features
 
@@ -19,7 +28,25 @@ host-specific files, and selected system files such as `/etc/hosts`.
 - System file synchronization
 - Upload verification
 
----
+## Quick Start
+
+```bash
+git clone <repository>
+cd shellsync
+
+python -m venv .venv
+source .venv/bin/activate
+
+pip install -e .
+
+shellsync status alienware
+shellsync push alienware --dry-run
+shellsync push alienware
+```
+
+## Screenshots
+
+[shellsync status showing synchronized files](images/status.png)
 
 ## Installation
 
@@ -31,8 +58,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 ```
-
----
 
 ## Project Layout
 
@@ -48,8 +73,6 @@ shellsync/
 ├── sync.toml
 └── src/
 ```
-
----
 
 ## Configuration
 
@@ -78,35 +101,31 @@ source = "common/.bash_functions"
 destination = ".bash_functions"
 ```
 
----
-
 ## Usage
 
 Check synchronization status:
 
 ```bash
-sync status alienware
+shellsync status alienware
 ```
 
 Preview changes:
 
 ```bash
-sync push alienware --dry-run
+shellsync push alienware --dry-run
 ```
 
 Synchronize files:
 
 ```bash
-sync push alienware
+shellsync push alienware
 ```
 
 Synchronize multiple hosts:
 
 ```bash
-sync push alienware r400
+shellsync push alienware r400
 ```
-
----
 
 ## Host-specific files
 
@@ -134,8 +153,6 @@ becomes:
 ~/.bash_aliases.r400
 ```
 
----
-
 ## System files
 
 Currently supported:
@@ -149,18 +166,18 @@ System files are:
 - backed up before replacement
 - verified after installation
 
----
-
 ## Typical workflow
 
 ```bash
-sync status r400
-sync push r400 --dry-run
-sync push r400
-sync status r400
+shellsync status r400
+shellsync push r400 --dry-run
+shellsync push r400
+shellsync status r400
 ```
 
----
+## Screen shot
+
+
 
 ## Exit codes
 
@@ -170,9 +187,6 @@ sync status r400
 | 1 | Synchronization completed with errors |
 | 2 | Invalid command or configuration |
 
-
----
-
 ## Requirements
 
 - Python 3.11+
@@ -181,30 +195,15 @@ sync status r400
 - Passwordless SSH authentication (recommended)
 - Passwordless `sudo` for managed system files
 
----
-
 ## Roadmap
 
 Planned features:
 
-- `sync doctor`
+- `shellsync doctor`
 - Improved diagnostics
 - Automated test suite
 - Additional managed system files
 
----
-
 ## License
 
 MIT
-
----
-
-## Philosophy
-
-`shellsync` is intentionally small.
-
-It is designed to manage personal shell configuration across a handful 
-of trusted Linux systems. Rather than trying to replace configuration 
-management frameworks, it emphasizes simplicity, safety, and predictable 
-behavior.

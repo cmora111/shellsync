@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-sync = "shellsync.cli:main"
+shellsync = "shellsync.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -8,7 +8,7 @@ from .engine import SyncEngine
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="sync",
+        prog="shellsync",
         description=(
             "Synchronize shell configuration files "
             "to Linux hosts over SSH."
@@ -93,7 +93,7 @@ def main() -> int:
 
             if unknown:
                 print(
-                    "sync: unknown host(s): "
+                    "shellsync: unknown host(s): "
                     + ", ".join(unknown),
                     file=sys.stderr,
                 )
