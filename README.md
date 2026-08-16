@@ -50,13 +50,24 @@ shellsync push alienware
 
 ## Installation
 
+### Using pipx (recommended)
+
+```bash
+sudo apt install pipx
+pipx ensurepath
+
+pipx install git+https://github.com/<username>/shellsync.git
+```
+
+### For development
+
 ```bash
 git clone ...
 cd shellsync
 
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-pip install -e .
+python3 -m pip install -e .
 ```
 
 ## Project Layout
