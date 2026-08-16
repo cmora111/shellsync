@@ -1,35 +1,33 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
 
 # Virtual environments
 .venv/
 venv/
 
-# Packaging
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build artifacts
 build/
 dist/
 *.egg-info/
 
-# Tests / coverage
+# Test output
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Type checking
-.mypy_cache/
-
-# Editors
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 .nvim/
 
-# Logs
-*.log
+# OS files
+.DS_Store
 
-# Local configuration
-sync.toml
-.Location
+# Misc files
+project-structure
+

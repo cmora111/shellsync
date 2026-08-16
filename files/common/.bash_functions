@@ -2,7 +2,8 @@ function via {
     vi ~/.bash_aliases ; source ~/.bash_aliases
 }
 function agi {
-   sudo apt-get -y install $1 && echo $1 >> ~/README.installed
+
+    sudo apt-get -y install $1 && echo $1 >> ~/README.installed
 }
 function bkp {
     cp $1 $1.bkp
