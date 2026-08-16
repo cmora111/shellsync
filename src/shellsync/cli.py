@@ -4,6 +4,7 @@ import sys
 
 from .config import load_config
 from .engine import SyncEngine
+from importlib.metadata import version
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -13,6 +14,12 @@ def build_parser() -> argparse.ArgumentParser:
             "Synchronize shell configuration files "
             "to Linux hosts over SSH."
         ),
+    )
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {version('shellsync')}",
     )
 
     parser.add_argument(
