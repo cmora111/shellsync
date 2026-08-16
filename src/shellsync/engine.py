@@ -4,6 +4,12 @@ import shlex
 from .models import Config, Host, SyncItem
 from .remote import RemoteConnection, SSHError, SyncError
 from .checksum import file_sha256
+from .output import ( 
+    heading,
+    success,
+    error,
+    print_status,
+)
 
 class SyncEngine:
     def __init__(
@@ -16,14 +22,14 @@ class SyncEngine:
         self.dry_run = dry_run
 
     def push_host(self, host: Host) -> bool:
-        print(
-            f"\nConnecting to {host.name} "
+        heading(
+            f"Connecting to {host.name} "
             f"({host.username}@{host.address})..."
         )
 
         try:
             with RemoteConnection(host) as remote:
-                print(f"✓ Connected as {host.username}")
+                success(f"Connected as {host.username}")
 
                 self._process_host_items(
                     remote,
@@ -34,7 +40,7 @@ class SyncEngine:
                 self._push_system_hosts(remote)
 
         except (SSHError, SyncError) as exc:
-            print(f"✗ ERROR: {exc}")
+            error("ERROR:", str(exc))
             return False
 
         return True
@@ -54,19 +60,18 @@ class SyncEngine:
         remote_hash = remote.file_hash(destination)
 
         if local_hash == remote_hash:
-            print("  CURRENT     /etc/hosts")
+            print_status("CURRENT", destination)
         else:
-            print("  UPDATE      /etc/hosts")
-
+            print_status("UPDATE", destination)
     def status_host(self, host: Host) -> bool:
-        print(
-            f"\nConnecting to {host.name} "
+        heading(
+            f"Connecting to {host.name} "
             f"({host.username}@{host.address})..."
         )
 
         try:
             with RemoteConnection(host) as remote:
-                print(f"✓ Connected as {host.username}")
+                success(f"Connected as {host.username}")
 
                 self._process_host_items(
                     remote,
@@ -77,7 +82,7 @@ class SyncEngine:
                 self._status_system_hosts(remote)
 
         except (SSHError, SyncError) as exc:
-            print(f"✗ ERROR: {exc}")
+            error("ERROR:", str(exc))
             return False
 
         return True
@@ -91,16 +96,16 @@ class SyncEngine:
         destination = remote.remote_path(item.destination)
 
         if not source.exists():
-            print(f"  MISSING     {item.destination}")
+            print_status("MISSING", item.destination)
             return
 
         local_hash = file_sha256(source)
         remote_hash = remote.file_hash(destination)
 
         if local_hash == remote_hash:
-            print(f"  CURRENT     {item.destination}")
+            print_status("CURRENT", item.destination)
         else:
-            print(f"  UPDATE      {item.destination}")
+           print_status("UPDATE", item.destination)
 
     def _push_item(
         self,
@@ -112,7 +117,7 @@ class SyncEngine:
         destination = remote.remote_path(item.destination)
 
         if not source.exists():
-            print(f"  MISSING     {source}")
+            print_status("MISSING", source)
             return
 
         # New code starts here
@@ -120,19 +125,19 @@ class SyncEngine:
         remote_hash = remote.file_hash(destination)
 
         if local_hash == remote_hash:
-            print(f"  CURRENT     {item.destination}")
+            print_status("CURRENT", item.destination)
             return
 
         if self.dry_run:
-            print(
-                f"  WOULD PUSH  {source} -> {destination}"
+            print_status(
+                "WOULD PUSH", f"{source} -> {destination}"
             )
             return
 
         if self.config.backup and remote.exists(destination):
             backup = remote.backup(destination)
             if backup:
-                print(f"  BACKUP      {destination}")
+                print_status("BACKUP", destination)
 
         if source.is_dir():
             remote.upload_directory(source, destination)
@@ -144,10 +149,10 @@ class SyncEngine:
 
         if new_hash != local_hash:
             raise SyncError(
-                f"Verification failed for {destination}"
+                f"Verification failed for {destination}: {stderr.strip()}"
             )
 
-        print(f"  PUSHED      {item.destination}")
+        print_status("PUSHED", item.destination)
 
     def _process_host_items(
         self,
@@ -185,42 +190,45 @@ class SyncEngine:
         self,
         remote: RemoteConnection,
     ) -> None:
+        destination = "/etc/hosts"
+        backup = f"{destination}.sync-backup"
+
         source = self.config.source_directory / "system" / "hosts"
 
         if not source.is_file():
             return
 
-        destination = "/etc/hosts"
         temp = remote.remote_path(".shellsync-hosts.tmp")
 
         local_hash = file_sha256(source)
         remote_hash = remote.file_hash(destination)
 
         if local_hash == remote_hash:
-            print("  CURRENT     /etc/hosts")
+            print_status("CURRENT", destination) 
             return
 
         if self.dry_run:
-            print(f"  WOULD PUSH  {source} -> {destination}")
+            print_status("WOULD PUSH", f"{source} -> {destination}")
             return
 
         remote.upload_file(source, temp)
 
-        status, _, stderr = remote.execute_sudo(
-            "cp -a /etc/hosts /etc/hosts.sync-backup && "
-            f"install -m 0644 {shlex.quote(temp)} /etc/hosts"
+        exit_status, _, stderr = remote.execute_sudo(
+            f"cp -a {shlex.quote(destination)} {shlex.quote(backup)} && "
+            f"install -m 0644 {shlex.quote(temp)} {shlex.quote(destination)}"
         )
 
-        if status != 0:
+        if exit_status != 0:
             raise SyncError(
-                f"Unable to install /etc/hosts: {stderr.strip()}"
+                f"Unable to install {destination}: {stderr.strip()}"
             )
 
         new_hash = remote.file_hash(destination)
 
         if new_hash != local_hash:
-            raise SyncError("Verification failed for /etc/hosts")
+            raise SyncError(f"Verification failed for {destination}: {stderr.strip()}")
 
         remote.execute(f"rm -f -- {shlex.quote(temp)}")
 
-        print("  PUSHED      /etc/hosts")
+        print_status("PUSHED", destination)
+
