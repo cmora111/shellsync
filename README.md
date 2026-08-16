@@ -46,7 +46,7 @@ shellsync push alienware
 
 ## Screenshots
 
-[shellsync status showing synchronized files](images/status.png)
+![shellsync status showing synchronized files](images/status.png)
 
 ## Installation
 
