@@ -149,7 +149,7 @@ class SyncEngine:
 
         if new_hash != local_hash:
             raise SyncError(
-                f"Verification failed for {destination}: {stderr.strip()}"
+                f"Verification failed for {destination}"
             )
 
         print_status("PUSHED", item.destination)
